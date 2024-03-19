@@ -39,29 +39,10 @@ I.FX(node_macro, macro_base_period) = i0(node_macro) ;
 EC.FX(node_macro, macro_base_period) = y0(node_macro) - i0(node_macro) - c0(node_macro) ;
 
 * ------------------------------------------------------------------------------
-* solving the model region by region
+* Concurrent Solution Phase: Solving model with all regions concurrently
 * ------------------------------------------------------------------------------
 
-node_active(node) = no ;
+node_active(node_macro) = yes;
 
-LOOP(node $ node_macro(node),
-
-    node_active(node_macro) = no ;
-    node_active(node) = YES;
-*    DISPLAY node_active ;
-
-* ------------------------------------------------------------------------------
-* solve statement
-* ------------------------------------------------------------------------------
-
-    SOLVE MESSAGE_MACRO MAXIMIZING UTILITY USING NLP ;
-
-* write model status summary (by node)
-*    status(node,'modelstat') = MESSAGE_MACRO.modelstat ;
-*    status(node,'solvestat') = MESSAGE_MACRO.solvestat ;
-*    status(node,'resUsd')    = MESSAGE_MACRO.resUsd ;
-*    status(node,'objEst')    = MESSAGE_MACRO.objEst ;
-*    status(node,'objVal')    = MESSAGE_MACRO.objVal ;
-
-) ;
+SOLVE MESSAGE_MACRO MAXIMIZING UTILITY USING NLP;
 
