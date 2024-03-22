@@ -38,11 +38,28 @@ C.FX(node_macro, macro_base_period) = c0(node_macro) ;
 I.FX(node_macro, macro_base_period) = i0(node_macro) ;
 EC.FX(node_macro, macro_base_period) = y0(node_macro) - i0(node_macro) - c0(node_macro) ;
 
-* ------------------------------------------------------------------------------
-* Concurrent Solution Phase: Solving model with all regions concurrently
-* ------------------------------------------------------------------------------
-
-node_active(node_macro) = yes;
-
-SOLVE MESSAGE_MACRO MAXIMIZING UTILITY USING NLP;
-
+* Conditional execution based on solve_param
+if (solve_param = 1,    
+*solving the model region by region
+    node_active(node) = no;
+    LOOP(node $ node_macro(node),
+        node_active(node_macro) = no;
+        node_active(node) = YES;
+        SOLVE MESSAGE_MACRO MAXIMIZING UTILITY USING NLP;
+*        status(node,'modelstat') = MESSAGE_MACRO.modelstat;
+*        status(node,'solvestat') = MESSAGE_MACRO.solvestat;
+*        status(node,'resUsd')    = MESSAGE_MACRO.resUsd;
+*        status(node,'objEst')    = MESSAGE_MACRO.objEst;
+*        status(node,'objVal')    = MESSAGE_MACRO.objVal;
+    ) 
+elseif (solve_param = 2),
+*Solving model with all regions concurrently
+    node_active(node_macro) = YES;
+    SOLVE MESSAGE_MACRO MAXIMIZING UTILITY USING NLP;
+   
+* status('all','modelstat') = MESSAGE_MACRO.modelstat;
+* status('all','solvestat') = MESSAGE_MACRO.solvestat;
+* status('all','resUsd')    = MESSAGE_MACRO.resUsd;
+* status('all','objEst')    = MESSAGE_MACRO.objEst;
+* status('all','objVal')    = MESSAGE_MACRO.objVal;
+);
