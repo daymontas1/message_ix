@@ -45,14 +45,13 @@ If (mod(ctr, 2) eq 0,
 * calculate correction factor for labour force growth rate and apply for next iteration of MACRO
     gdp_mer_macro(node_macro,year) = (I.L(node_macro,year) + C.L(node_macro,year) + EC.L(node_macro,year)) * 1000 ;
     gdp_scale(node_macro,year) = gdp_mer_macro(node_macro,year)/gdp_calibrate(node_macro,year) ;
-    growth_correction(node_macro,year) $ (NOT macro_base_period(year)) = SUM(year2 $ seq_period(year2,year), ((gdp_calibrate(node_macro,year)/gdp_calibrate(node_macro,year2))**(1/duration_period(year)))
-                                                                                                           - ((gdp_mer_macro(node_macro,year)/gdp_mer_macro(node_macro,year2))**(1/duration_period(year))) ) ;
+    growth_correction(node_macro,year) $ (NOT macro_base_period(year)) = SUM(year2 $ seq_period(year2,year), 
+    (((SUM(sector, demand_MESSAGE(node_macro,sector,year))/card(sector)) / (SUM(sector, demand_new(node_macro,sector,year))/card(sector))) / 
+    ((SUM(sector, demand_MESSAGE(node_macro,sector,year2))/card(sector)) / (SUM(sector, demand_new(node_macro,sector,year2))/card(sector)))
+    )**(1/duration_period(year)) - 1);
+
     grow(node_macro,year) = grow(node_macro,year) + growth_correction(node_macro,year) ;
-Elseif mod(ctr, 2) eq 1,
-* calculate correction factor for aeei and apply for next iteration of MACRO
-    aeei_correction(node_macro,sector,year) $ (NOT macro_base_period(year)) = SUM(year2 $ seq_period(year2,year), ((demand_new(node_macro,sector,year)/demand_MESSAGE(node_macro,sector,year)) / (demand_new(node_macro,sector,year2)/demand_MESSAGE(node_macro,sector,year2)))**(1/duration_period(year)) - 1) ;
-    aeei(node_macro,sector,year) = aeei(node_macro,sector,year) + aeei_correction(node_macro,sector,year);
-) ;
+
 DISPLAY demand_scale, aeei_correction ;
 DISPLAY growth_correction, gdp_mer_macro, gdp_scale ;
 
